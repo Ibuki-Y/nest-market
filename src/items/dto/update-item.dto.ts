@@ -1,7 +1,8 @@
+import { ItemStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, MaxLength, IsInt, Min } from 'class-validator';
 
-export class CreateItemDto {
+export class UpdateItemDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(40)
@@ -11,6 +12,9 @@ export class CreateItemDto {
   @Min(1)
   @Type(() => Number)
   price: number;
+
+  @IsNotEmpty()
+  status: ItemStatus;
 
   @IsString()
   @IsNotEmpty()
