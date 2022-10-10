@@ -15,7 +15,7 @@ model Item {
   name        String
   price       Int
   status      ItemStatus @default(ON_SALE)
-  description String?
+  description String
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }

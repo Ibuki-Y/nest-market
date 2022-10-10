@@ -18,5 +18,5 @@ export class UpdateItemDto {
 
   @IsString()
   @IsNotEmpty()
-  description?: string;
+  description: string;
 }

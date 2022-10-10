@@ -14,5 +14,5 @@ export class CreateItemDto {
 
   @IsString()
   @IsNotEmpty()
-  description?: string;
+  description: string;
 }
