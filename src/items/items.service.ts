@@ -9,8 +9,6 @@ import { UpdateItemDto } from './dto/update-item.dto';
 @Injectable()
 export class ItemsService {
   constructor(private prisma: PrismaService) {}
-  private items: Item[] = [];
-
   findAll(): Promise<Item[]> {
     return this.prisma.item.findMany({
       orderBy: {
@@ -40,9 +38,6 @@ export class ItemsService {
   }
 
   async update(id: string, updateItemDto: UpdateItemDto): Promise<Item> {
-    // const item = this.findById(id);
-    // item.status = ItemStatus.SOLD_OUT;
-    // return item;
     const item = await this.prisma.item.findUnique({
       where: {
         id,
