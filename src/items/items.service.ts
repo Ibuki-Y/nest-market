@@ -17,39 +17,64 @@ export class ItemsService {
     });
   }
 
-  findById(id: string): Promise<Item> {
-    return this.prisma.item.findFirst({
+  findAllByUserId(userId: string): Promise<Item[]> {
+    return this.prisma.item.findMany({
       where: {
-        id,
+        userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }
 
-  async create(createItemDto: CreateItemDto): Promise<Item> {
+  findById(itemId: string): Promise<Item> {
+    return this.prisma.item.findFirst({
+      where: {
+        id: itemId,
+      },
+    });
+  }
+
+  findByUserId(userId: string, itemId: string): Promise<Item> {
+    return this.prisma.item.findFirst({
+      where: {
+        userId,
+        id: itemId,
+      },
+    });
+  }
+
+  async create(userId: string, createItemDto: CreateItemDto): Promise<Item> {
     const item = await this.prisma.item.create({
       data: {
         id: uuid(),
         ...createItemDto,
         status: ItemStatus.ON_SALE,
+        userId,
       },
     });
 
     return item;
   }
 
-  async update(id: string, updateItemDto: UpdateItemDto): Promise<Item> {
+  async update(
+    userId: string,
+    itemId: string,
+    updateItemDto: UpdateItemDto,
+  ): Promise<Item> {
     const item = await this.prisma.item.findUnique({
       where: {
-        id,
+        id: itemId,
       },
     });
-    if (!item) {
+    if (!item || item.userId !== userId) {
       throw new ForbiddenException('No permision to update');
     }
 
     return this.prisma.item.update({
       where: {
-        id,
+        id: itemId,
       },
       data: {
         ...updateItemDto,
@@ -57,19 +82,19 @@ export class ItemsService {
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(userId: string, itemId: string): Promise<void> {
     const item = await this.prisma.item.findUnique({
       where: {
-        id,
+        id: itemId,
       },
     });
-    if (!item) {
+    if (!item || item.userId !== userId) {
       throw new ForbiddenException('No permision to delete');
     }
 
     await this.prisma.item.delete({
       where: {
-        id,
+        id: itemId,
       },
     });
   }
