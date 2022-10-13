@@ -1,8 +1,5 @@
-import {
-  ForbiddenException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuid } from 'uuid';
 import * as bcrypt from 'bcrypt';
@@ -16,6 +13,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
   ) {}
 
   async signup(createUserDto: CreateUserDto): Promise<User> {
@@ -51,13 +49,22 @@ export class AuthService {
       throw new ForbiddenException('Username or password incorrected');
     }
 
-    try {
-      const payload = { id: user.id, username: user.username };
-      const accessToken = this.jwtService.sign(payload);
+    return this.generateJwt(user.id, user.username);
+  }
 
-      return { accessToken };
-    } catch (e) {
-      throw new UnauthorizedException('Check username or password');
-    }
+  async generateJwt(
+    id: string,
+    username: string,
+  ): Promise<{ accessToken: string }> {
+    const payload = { id, username };
+    const secret = this.config.get('JWT_SECRET');
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: '30m',
+      secret: secret,
+    });
+
+    return {
+      accessToken: token,
+    };
   }
 }

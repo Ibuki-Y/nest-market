@@ -7,11 +7,13 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { Item } from '@prisma/client';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('items')
 export class ItemsController {
@@ -28,11 +30,13 @@ export class ItemsController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   create(@Body() createItemDto: CreateItemDto): Promise<Item> {
     return this.itemsService.create(createItemDto);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateItemDto: UpdateItemDto,
@@ -41,6 +45,7 @@ export class ItemsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.itemsService.delete(id);
   }
