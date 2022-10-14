@@ -9,12 +9,14 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { Item, User } from '@prisma/client';
+import { Item, User, UserStatus } from '@prisma/client';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/decorator/get-user.decorator';
+import { Role } from '../auth/decorator/role.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('items')
 export class ItemsController {
@@ -44,7 +46,8 @@ export class ItemsController {
   // }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @Role(UserStatus.PREMIUM)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   create(
     @Body() createItemDto: CreateItemDto,
     @GetUser() user: User,
